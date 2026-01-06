@@ -1,35 +1,106 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [lists, setLists] = useState([
+    { id: 1, name: "List 1", tasks: [] }
+  ]);
+  const [activeListId, setActiveListId] = useState(1);
+  const [input, setInput] = useState("");
+
+  const activeList = lists.find(l => l.id === activeListId);
+
+  const addNewList = () => {
+    const newId = lists.length + 1;
+    setLists([
+      ...lists,
+      { id: newId, name: `List ${newId}`, tasks: [] }
+    ]);
+    setActiveListId(newId);
+    setInput("");
+  };
+
+  const addTask = () => {
+    if (input.trim() === "") return;
+
+    setLists(
+      lists.map(list =>
+        list.id === activeListId
+          ? {
+              ...list,
+              tasks: [...list.tasks, { text: input, done: false }]
+            }
+          : list
+      )
+    );
+    setInput("");
+  };
+
+  const toggleTask = (index) => {
+    setLists(
+      lists.map(list =>
+        list.id === activeListId
+          ? {
+              ...list,
+              tasks: list.tasks.map((task, i) =>
+                i === index ? { ...task, done: !task.done } : task
+              )
+            }
+          : list
+      )
+    );
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div style={{ padding: "20px", maxWidth: "500px" }}>
+      <h1>To-Do Lists</h1>
+
+      {/* Tabs */}
+      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+        {lists.map(list => (
+          <button
+            key={list.id}
+            onClick={() => setActiveListId(list.id)}
+            style={{
+              fontWeight: list.id === activeListId ? "bold" : "normal"
+            }}
+          >
+            {list.name}
+          </button>
+        ))}
+        <button onClick={addNewList}>+ New List</button>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+
+      {/* Task input */}
+      <input
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="Add new task"
+      />
+      <button onClick={addTask}>Add</button>
+
+      {/* Task list */}
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {activeList.tasks.map((task, index) => (
+          <li key={index} style={{ marginTop: "10px" }}>
+            <input
+              type="checkbox"
+              checked={task.done}
+              onChange={() => toggleTask(index)}
+            />
+            <span
+              style={{
+                marginLeft: "10px",
+                textDecoration: task.done ? "line-through" : "none"
+              }}
+            >
+              {task.text}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-export default App
+export default App;
