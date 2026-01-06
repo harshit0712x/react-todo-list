@@ -1,11 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
-  const [lists, setLists] = useState([
-    { id: 1, name: "List 1", tasks: [] }
-  ]);
-  const [activeListId, setActiveListId] = useState(1);
+  const [lists, setLists] = useState(() => {
+  const saved = localStorage.getItem("todoLists");
+  return saved
+    ? JSON.parse(saved)
+    : [{ id: 1, name: "List 1", tasks: [] }];
+});
+
+const [activeListId, setActiveListId] = useState(() => {
+  const saved = localStorage.getItem("activeListId");
+  return saved ? Number(saved) : 1;
+});
+
   const [input, setInput] = useState("");
+
+  useEffect(() => {
+  localStorage.setItem("todoLists", JSON.stringify(lists));
+  localStorage.setItem("activeListId", activeListId);
+}, [lists, activeListId]);
 
   const activeList = lists.find(l => l.id === activeListId);
 
