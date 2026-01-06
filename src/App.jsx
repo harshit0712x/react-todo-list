@@ -62,6 +62,18 @@ const [activeListId, setActiveListId] = useState(() => {
       )
     );
   };
+  const deleteTask = (index) => {
+  setLists(
+    lists.map(list =>
+      list.id === activeListId
+        ? {
+            ...list,
+            tasks: list.tasks.filter((_, i) => i !== index)
+          }
+        : list
+    )
+  );
+};
 
   return (
     <div style={{ padding: "20px", maxWidth: "500px" }}>
@@ -95,22 +107,33 @@ const [activeListId, setActiveListId] = useState(() => {
       {/* Task list */}
       <ul style={{ listStyle: "none", padding: 0 }}>
         {activeList.tasks.map((task, index) => (
-          <li key={index} style={{ marginTop: "10px" }}>
-            <input
-              type="checkbox"
-              checked={task.done}
-              onChange={() => toggleTask(index)}
-            />
-            <span
-              style={{
-                marginLeft: "10px",
-                textDecoration: task.done ? "line-through" : "none"
-              }}
-            >
-              {task.text}
-            </span>
-          </li>
-        ))}
+  <li
+    key={index}
+    style={{
+      marginTop: "10px",
+      display: "flex",
+      alignItems: "center",
+      gap: "10px"
+    }}
+  >
+    <input
+      type="checkbox"
+      checked={task.done}
+      onChange={() => toggleTask(index)}
+    />
+
+    <span
+      style={{
+        flex: 1,
+        textDecoration: task.done ? "line-through" : "none"
+      }}
+    >
+      {task.text}
+    </span>
+
+    <button onClick={() => deleteTask(index)}>❌</button>
+  </li>
+))}
       </ul>
     </div>
   );
